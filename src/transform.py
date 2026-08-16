@@ -35,7 +35,12 @@ def transform_books(df):
     df["rating"] = df["rating"].astype(int)
     df["stock"] = df["stock"].astype(bool)
 
-    # Derived column
+    # Create price category
+    df["price_category"] = df["price"].apply(
+        lambda x: "Expensive" if x >= 50 else "Normal"
+    )
+
+    # Create price with tax
     df["price_with_tax"] = (
         df["price"] * 1.19
     ).round(2)
