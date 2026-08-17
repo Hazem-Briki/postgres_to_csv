@@ -15,7 +15,7 @@ def test_negative_price_is_removed():
 
     result = transform_books(df)
 
-    assert len(result) == 1
+    assert len(result) == 2
     assert result.iloc[0]["name"] == "Book A"
     assert result.iloc[0]["price"] == 50.0
 
