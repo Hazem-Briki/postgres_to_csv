@@ -16,13 +16,13 @@ def test_negative_price_is_removed():
     result = transform_books(df)
 
     assert len(result) == 1
-    assert result.iloc[0]["name"] == "Book A"
-    assert result.iloc[0]["price"] == 50.0
+    assert result.iloc[0]["id"] == 1
+
 
 def test_duplicates_are_removed():
 
     df = pd.DataFrame({
-        "id": [1, 2, 3],
+        "id": [1, 1, 2],
         "name": ["Book A", "Book A", "Book B"],
         "price": [50.0, 50.0, 30.0],
         "rating": [4, 4, 3],
@@ -32,12 +32,14 @@ def test_duplicates_are_removed():
     result = transform_books(df)
 
     assert len(result) == 2
+    assert result["id"].nunique() == 2
+
 
 def test_name_is_stripped():
 
     df = pd.DataFrame({
         "id": [1],
-        "name": ["  Book A  "],
+        "name": ["   Book A   "],
         "price": [50.0],
         "rating": [4],
         "stock": [True]
