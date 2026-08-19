@@ -2,7 +2,7 @@ import logging
 
 from extract import extract_books
 from transform import transform_books
-from load import load_to_csv
+from load import get_last_successful_run, upsert_books
 
 
 logging.basicConfig(
@@ -13,28 +13,40 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def main():
+def run_etl():
 
     logger.info("ETL started")
 
-    try:
-        df = extract_books()
-        logger.info("Extracted %d rows", len(df))
+    last_successful_run = get_last_successful_run()
 
-        df = transform_books(df)
-        logger.info("Transformed dataset: %d rows", len(df))
+    logger.info(
+        "Last successful run: %s",
+        last_successful_run
+    )
 
-        output_file = "output/books_clean.csv"
+    df = extract_books(last_successful_run)
 
-        load_to_csv(df, output_file)
-        logger.info("CSV created: %s", output_file)
+    logger.info(
+        "Extracted %d rows",
+        len(df)
+    )
 
+    if df.empty:
+        logger.info("No new or changed records found")
         logger.info("ETL completed successfully")
+        return
 
-    except Exception as e:
-        logger.error("ETL failed: %s", e)
-        raise
+    df = transform_books(df)
+
+    logger.info(
+        "Transformed dataset: %d rows",
+        len(df)
+    )
+
+    upsert_books(df)
+
+    logger.info("ETL completed successfully")
 
 
 if __name__ == "__main__":
-    main()
+    run_etl()
